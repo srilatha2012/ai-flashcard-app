@@ -120,9 +120,22 @@ footer {
   padding: 1rem;
 }
 
-.deck-sidebar h2 {
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.sidebar-header h2 {
   margin-top: 0;
+  margin-bottom: 0;
   font-size: 1.1rem;
+}
+
+.icon-btn {
+  padding: 0.4rem 0.6rem;
+  min-width: 2.2rem;
 }
 
 .deck-list {
@@ -220,6 +233,64 @@ footer {
 footer {
   padding: 1.25rem 0 2rem;
   color: var(--muted);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-dialog {
+  position: relative;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  width: min(100%, 420px);
+  box-shadow: var(--shadow);
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: 0;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+}
+
+.modal form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.danger-btn {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+.danger-btn:hover {
+  background: #b91c1c;
 }
 
 .sr-only {
