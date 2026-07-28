@@ -27,6 +27,10 @@ let editingDeckId = null;
 let editingCardId = null;
 let activeModal = null;
 let lastFocusedElement = null;
+let studyModeActive = false;
+let studyModeDeckId = null;
+let studyModeListenersAttached = false;
+let studyOrder = [];
 
 const deckList = document.getElementById('deck-list');
 const deckTitle = document.getElementById('deck-title');
@@ -75,10 +79,7 @@ function renderDecks() {
     link.textContent = deck.name;
     link.addEventListener('click', (event) => {
       event.preventDefault();
-      activeDeckId = deck.id;
-      activeCardIndex = 0;
-      isCardFlipped = false;
-      renderDecks();
+      enterStudyMode(deck.id);
     });
     li.appendChild(link);
     deckList.appendChild(li);
@@ -226,6 +227,12 @@ function renderCards() {
   });
 }
 
+function getStudyCards() {
+  const activeDeck = getActiveDeck();
+  if (!activeDeck || activeDeck.cards.length === 0) return [];
+  return activeDeck.cards;
+}
+
 function renderStudyCard() {
   const activeDeck = getActiveDeck();
   if (!activeDeck || activeDeck.cards.length === 0) {
@@ -235,11 +242,11 @@ function renderStudyCard() {
     return;
   }
 
-  if (activeCardIndex >= activeDeck.cards.length) {
-    activeCardIndex = activeDeck.cards.length - 1;
+  if (activeCardIndex >= studyOrder.length) {
+    activeCardIndex = studyOrder.length - 1;
   }
 
-  const card = activeDeck.cards[activeCardIndex];
+  const card = studyOrder[activeCardIndex];
   studyCardFront.textContent = card.front;
   studyCardBack.textContent = card.back;
   studyCard.classList.toggle('is-flipped', isCardFlipped);
@@ -249,15 +256,85 @@ function showCard(direction) {
   const activeDeck = getActiveDeck();
   if (!activeDeck || activeDeck.cards.length === 0) return;
 
-  activeCardIndex = (activeCardIndex + direction + activeDeck.cards.length) % activeDeck.cards.length;
+  activeCardIndex = (activeCardIndex + direction + studyOrder.length) % studyOrder.length;
   isCardFlipped = false;
   renderStudyCard();
 }
 
 function flipStudyCard() {
-  if (!getActiveDeck() || getActiveDeck().cards.length === 0) return;
+  const cards = getStudyCards();
+  if (!cards.length) return;
   isCardFlipped = !isCardFlipped;
   renderStudyCard();
+}
+
+function shuffleStudyOrder() {
+  const cards = getStudyCards();
+  if (!cards.length) return;
+
+  const copy = [...cards];
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+  }
+
+  studyOrder = copy;
+  activeCardIndex = 0;
+  isCardFlipped = false;
+  renderStudyCard();
+}
+
+function enterStudyMode(deckId) {
+  activeDeckId = deckId;
+  const activeDeck = getActiveDeck();
+  if (!activeDeck || activeDeck.cards.length === 0) {
+    studyOrder = [];
+    activeCardIndex = 0;
+    isCardFlipped = false;
+    renderDecks();
+    return;
+  }
+
+  studyModeActive = true;
+  studyModeDeckId = deckId;
+  studyOrder = [...activeDeck.cards];
+  activeCardIndex = 0;
+  isCardFlipped = false;
+  renderDecks();
+  attachStudyModeListeners();
+}
+
+function exitStudyMode() {
+  studyModeActive = false;
+  studyModeDeckId = null;
+  detachStudyModeListeners();
+}
+
+function attachStudyModeListeners() {
+  if (studyModeListenersAttached) return;
+  document.addEventListener('keydown', handleStudyKeyboard);
+  studyModeListenersAttached = true;
+}
+
+function detachStudyModeListeners() {
+  if (!studyModeListenersAttached) return;
+  document.removeEventListener('keydown', handleStudyKeyboard);
+  studyModeListenersAttached = false;
+}
+
+function handleStudyKeyboard(event) {
+  if (activeModal) return;
+
+  if (event.code === 'Space') {
+    event.preventDefault();
+    flipStudyCard();
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    showCard(-1);
+  } else if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    showCard(1);
+  }
 }
 
 function openCardModal(mode = 'create', cardId = null) {
@@ -286,6 +363,7 @@ function createCard(front, back) {
   if (!trimmedFront || !trimmedBack) return;
 
   activeDeck.cards.unshift({ id: Date.now(), front: trimmedFront, back: trimmedBack });
+  studyOrder = [...activeDeck.cards];
   activeCardIndex = 0;
   isCardFlipped = false;
   renderDecks();
@@ -300,6 +378,7 @@ function updateCard(cardId, front, back) {
   if (!trimmedFront || !trimmedBack) return;
 
   activeDeck.cards = activeDeck.cards.map((card) => (card.id === cardId ? { ...card, front: trimmedFront, back: trimmedBack } : card));
+  studyOrder = [...activeDeck.cards];
   renderDecks();
 }
 
@@ -314,6 +393,7 @@ function deleteCard(cardId) {
   if (!shouldDelete) return;
 
   activeDeck.cards = activeDeck.cards.filter((card) => card.id !== cardId);
+  studyOrder = [...activeDeck.cards];
   if (activeCardIndex >= activeDeck.cards.length) {
     activeCardIndex = Math.max(0, activeDeck.cards.length - 1);
   }
@@ -430,6 +510,9 @@ prevCardBtn.addEventListener('click', () => showCard(-1));
 flipCardBtn.addEventListener('click', flipStudyCard);
 nextCardBtn.addEventListener('click', () => showCard(1));
 
+const shuffleBtn = document.querySelector('.toolbar button');
+shuffleBtn.addEventListener('click', shuffleStudyOrder);
+
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && activeModal) {
     if (activeModal === deckModal) {
@@ -443,3 +526,4 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keydown', trapFocus);
 
 renderDecks();
+enterStudyMode(activeDeckId);
