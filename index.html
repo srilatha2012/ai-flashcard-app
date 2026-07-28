@@ -28,7 +28,7 @@
               <p class="deck-label">Current deck</p>
               <h2 id="deck-title">General Knowledge</h2>
             </div>
-            <button type="button" class="secondary-btn">New Card</button>
+            <button type="button" class="secondary-btn" id="new-card-btn">New Card</button>
           </div>
 
           <div class="toolbar" role="toolbar" aria-label="Deck tools">
@@ -39,21 +39,28 @@
             <button type="button">Shuffle</button>
           </div>
 
-          <article class="flashcard" aria-label="Flashcard">
-            <div class="flashcard-face">
+          <article class="card flashcard" id="study-card" aria-label="Flashcard">
+            <div class="flashcard-face front">
               <h3>Front</h3>
-              <p>What is the capital of France?</p>
+              <p id="study-card-front"></p>
             </div>
             <div class="flashcard-face back">
               <h3>Back</h3>
-              <p>Paris</p>
+              <p id="study-card-back"></p>
             </div>
           </article>
 
           <div class="card-controls" role="group" aria-label="Flashcard controls">
-            <button type="button">Previous</button>
-            <button type="button">Flip</button>
-            <button type="button">Next</button>
+            <button type="button" id="prev-card-btn">Previous</button>
+            <button type="button" id="flip-card-btn">Flip</button>
+            <button type="button" id="next-card-btn">Next</button>
+          </div>
+
+          <div class="card-manager">
+            <div class="manager-header">
+              <h3>Cards in Deck</h3>
+            </div>
+            <ul class="card-list" id="card-list"></ul>
           </div>
         </section>
       </main>
@@ -74,6 +81,24 @@
             <button type="button" class="danger-btn" id="delete-deck-btn" hidden>Delete Deck</button>
             <button type="button" class="secondary-btn" id="cancel-modal-btn">Cancel</button>
             <button type="submit" class="primary-btn">Save Deck</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="card-modal" aria-hidden="true" role="dialog" aria-labelledby="card-modal-title">
+      <div class="modal-dialog" role="document">
+        <button class="modal-close" type="button" aria-label="Close dialog">×</button>
+        <h2 id="card-modal-title">New Card</h2>
+        <form id="card-form">
+          <label for="card-front">Front</label>
+          <textarea id="card-front" name="front" rows="3" required maxlength="160"></textarea>
+          <label for="card-back">Back</label>
+          <textarea id="card-back" name="back" rows="3" required maxlength="160"></textarea>
+          <div class="modal-actions">
+            <button type="button" class="danger-btn" id="delete-card-btn" hidden>Delete Card</button>
+            <button type="button" class="secondary-btn" id="cancel-card-btn">Cancel</button>
+            <button type="submit" class="primary-btn">Save Card</button>
           </div>
         </form>
       </div>
