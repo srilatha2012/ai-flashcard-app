@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flashcards Study App</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Flashcards Study App</h1>
+      <button type="button">Add Card</button>
+    </header>
+
+    <div class="layout">
+      <nav class="deck-sidebar" aria-label="Flashcard decks">
+        <h2>Decks</h2>
+        <ul>
+          <li><a href="#">General Knowledge</a></li>
+          <li><a href="#">Science</a></li>
+          <li><a href="#">History</a></li>
+        </ul>
+      </nav>
+
+      <main>
+        <section aria-labelledby="study-heading">
+          <h2 id="study-heading">Current Deck</h2>
+
+          <article class="card" aria-label="Flashcard">
+            <h3>Question</h3>
+            <p>What is the capital of France?</p>
+          </article>
+
+          <div class="card-controls" role="group" aria-label="Flashcard controls">
+            <button type="button">Previous</button>
+            <button type="button">Flip Card</button>
+            <button type="button">Next</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <footer>
+      <p>Study smarter, one card at a time.</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
