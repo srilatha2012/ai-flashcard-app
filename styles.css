@@ -324,9 +324,44 @@ footer {
   padding: 0.45rem 0.7rem;
 }
 
-.empty-state {
+.empty-state-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface-2);
   color: var(--muted);
-  padding: 0.8rem 0;
+}
+
+.empty-state-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.empty-state-card h4 {
+  margin: 0 0 0.3rem;
+  color: var(--text);
+}
+
+.empty-state-card p {
+  margin: 0;
+}
+
+.sidebar-empty-state {
+  margin-top: 0.75rem;
+}
+
+.form-error {
+  min-height: 1.2rem;
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.95rem;
+}
+
+[aria-invalid="true"] {
+  border-color: #b91c1c;
 }
 
 footer {

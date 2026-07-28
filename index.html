@@ -32,13 +32,13 @@
           </div>
 
           <div class="toolbar" role="toolbar" aria-label="Deck tools">
-            <label class="search-field">
+            <label class="search-field" for="card-search">
               <span class="sr-only">Search cards</span>
-              <input id="card-search" type="search" placeholder="Search cards" />
+              <input id="card-search" type="search" placeholder="Search cards" aria-label="Search cards" />
             </label>
-            <button type="button">Shuffle</button>
+            <button type="button" aria-label="Shuffle cards">Shuffle</button>
           </div>
-          <p class="search-results" id="search-results">Showing all cards</p>
+          <p class="search-results" id="search-results" role="status" aria-live="polite">Showing all cards</p>
 
           <article class="card flashcard" id="study-card" aria-label="Flashcard">
             <div class="flashcard-face front">
@@ -71,13 +71,14 @@
       <p>Tip: Flip the card to reveal the answer, then move to the next one.</p>
     </footer>
 
-    <div class="modal" id="deck-modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+    <div class="modal" id="deck-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div class="modal-dialog" role="document">
         <button class="modal-close" type="button" aria-label="Close dialog">×</button>
         <h2 id="modal-title">New Deck</h2>
-        <form id="deck-form">
+        <form id="deck-form" novalidate>
           <label for="deck-name">Deck name</label>
-          <input id="deck-name" name="deckName" type="text" required maxlength="40" />
+          <input id="deck-name" name="deckName" type="text" maxlength="40" aria-describedby="deck-error" />
+          <p class="form-error" id="deck-error" role="alert"></p>
           <div class="modal-actions">
             <button type="button" class="danger-btn" id="delete-deck-btn" hidden>Delete Deck</button>
             <button type="button" class="secondary-btn" id="cancel-modal-btn">Cancel</button>
@@ -87,15 +88,16 @@
       </div>
     </div>
 
-    <div class="modal" id="card-modal" aria-hidden="true" role="dialog" aria-labelledby="card-modal-title">
+    <div class="modal" id="card-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="card-modal-title">
       <div class="modal-dialog" role="document">
         <button class="modal-close" type="button" aria-label="Close dialog">×</button>
         <h2 id="card-modal-title">New Card</h2>
-        <form id="card-form">
+        <form id="card-form" novalidate>
           <label for="card-front">Front</label>
-          <textarea id="card-front" name="front" rows="3" required maxlength="160"></textarea>
+          <textarea id="card-front" name="front" rows="3" maxlength="160" aria-describedby="card-error"></textarea>
           <label for="card-back">Back</label>
-          <textarea id="card-back" name="back" rows="3" required maxlength="160"></textarea>
+          <textarea id="card-back" name="back" rows="3" maxlength="160" aria-describedby="card-error"></textarea>
+          <p class="form-error" id="card-error" role="alert"></p>
           <div class="modal-actions">
             <button type="button" class="danger-btn" id="delete-card-btn" hidden>Delete Card</button>
             <button type="button" class="secondary-btn" id="cancel-card-btn">Cancel</button>
