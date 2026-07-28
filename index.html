@@ -34,10 +34,11 @@
           <div class="toolbar" role="toolbar" aria-label="Deck tools">
             <label class="search-field">
               <span class="sr-only">Search cards</span>
-              <input type="search" placeholder="Search cards" />
+              <input id="card-search" type="search" placeholder="Search cards" />
             </label>
             <button type="button">Shuffle</button>
           </div>
+          <p class="search-results" id="search-results">Showing all cards</p>
 
           <article class="card flashcard" id="study-card" aria-label="Flashcard">
             <div class="flashcard-face front">
@@ -104,6 +105,7 @@
       </div>
     </div>
 
+    <script src="storage.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

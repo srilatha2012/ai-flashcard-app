@@ -19,8 +19,12 @@ const initialDecks = [
   }
 ];
 
-let decks = initialDecks.map((deck) => ({ ...deck, cards: [...deck.cards] }));
-let activeDeckId = initialDecks[0].id;
+const persistedState = (window.flashcardsStorage && typeof window.flashcardsStorage.loadState === 'function')
+  ? window.flashcardsStorage.loadState({ decks: initialDecks, activeDeckId: initialDecks[0].id })
+  : { decks: initialDecks, activeDeckId: initialDecks[0].id };
+
+let decks = (persistedState.decks || initialDecks).map((deck) => ({ ...deck, cards: [...(deck.cards || [])] }));
+let activeDeckId = persistedState.activeDeckId || initialDecks[0].id;
 let activeCardIndex = 0;
 let isCardFlipped = false;
 let editingDeckId = null;
@@ -60,6 +64,10 @@ const studyCardBack = document.getElementById('study-card-back');
 const prevCardBtn = document.getElementById('prev-card-btn');
 const flipCardBtn = document.getElementById('flip-card-btn');
 const nextCardBtn = document.getElementById('next-card-btn');
+const searchInput = document.getElementById('card-search');
+const searchResults = document.getElementById('search-results');
+let searchTerm = '';
+let searchDebounceTimer = null;
 
 function getActiveDeck() {
   return decks.find((deck) => deck.id === activeDeckId) || null;
@@ -139,6 +147,12 @@ function closeDeckModal() {
   deleteDeckBtn.hidden = true;
 }
 
+function persistState() {
+  if (window.flashcardsStorage && typeof window.flashcardsStorage.saveState === 'function') {
+    window.flashcardsStorage.saveState({ decks, activeDeckId });
+  }
+}
+
 function createDeck(name) {
   const trimmedName = name.trim();
   if (!trimmedName) return;
@@ -149,6 +163,7 @@ function createDeck(name) {
   activeCardIndex = 0;
   isCardFlipped = false;
   renderDecks();
+  persistState();
 }
 
 function updateDeckName(deckId, newName) {
@@ -157,6 +172,7 @@ function updateDeckName(deckId, newName) {
 
   decks = decks.map((deck) => (deck.id === deckId ? { ...deck, name: trimmedName } : deck));
   renderDecks();
+  persistState();
 }
 
 function deleteDeck(deckId) {
@@ -173,6 +189,18 @@ function deleteDeck(deckId) {
     isCardFlipped = false;
   }
   renderDecks();
+  persistState();
+}
+
+function getFilteredCards(activeDeck) {
+  if (!activeDeck) return [];
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  if (!normalizedSearch) return activeDeck.cards;
+
+  return activeDeck.cards.filter((card) => {
+    const haystack = `${card.front} ${card.back}`.toLowerCase();
+    return haystack.includes(normalizedSearch);
+  });
 }
 
 function renderCards() {
@@ -184,18 +212,27 @@ function renderCards() {
     emptyItem.className = 'empty-state';
     emptyItem.textContent = 'No deck selected.';
     cardList.appendChild(emptyItem);
+    searchResults.textContent = 'Showing 0 cards';
     return;
   }
 
-  if (activeDeck.cards.length === 0) {
+  const filteredCards = getFilteredCards(activeDeck);
+  const totalCards = activeDeck.cards.length;
+
+  if (filteredCards.length === 0) {
     const emptyItem = document.createElement('li');
     emptyItem.className = 'empty-state';
-    emptyItem.textContent = 'No cards yet. Add one to begin.';
+    emptyItem.textContent = searchTerm.trim()
+      ? 'No cards match your search.'
+      : 'No cards yet. Add one to begin.';
     cardList.appendChild(emptyItem);
+    searchResults.textContent = searchTerm.trim()
+      ? `No matches in ${activeDeck.name}`
+      : `${totalCards} card${totalCards === 1 ? '' : 's'} in ${activeDeck.name}`;
     return;
   }
 
-  activeDeck.cards.forEach((card, index) => {
+  filteredCards.forEach((card, index) => {
     const item = document.createElement('li');
     item.className = 'card-preview';
     if (index === activeCardIndex) {
@@ -225,6 +262,10 @@ function renderCards() {
     item.append(summary, actions);
     cardList.appendChild(item);
   });
+
+  searchResults.textContent = searchTerm.trim()
+    ? `Showing ${filteredCards.length} of ${totalCards} match${totalCards === 1 ? '' : 'es'}`
+    : `${totalCards} card${totalCards === 1 ? '' : 's'} in ${activeDeck.name}`;
 }
 
 function getStudyCards() {
@@ -302,6 +343,7 @@ function enterStudyMode(deckId) {
   isCardFlipped = false;
   renderDecks();
   attachStudyModeListeners();
+  persistState();
 }
 
 function exitStudyMode() {
@@ -367,6 +409,7 @@ function createCard(front, back) {
   activeCardIndex = 0;
   isCardFlipped = false;
   renderDecks();
+  persistState();
 }
 
 function updateCard(cardId, front, back) {
@@ -380,6 +423,7 @@ function updateCard(cardId, front, back) {
   activeDeck.cards = activeDeck.cards.map((card) => (card.id === cardId ? { ...card, front: trimmedFront, back: trimmedBack } : card));
   studyOrder = [...activeDeck.cards];
   renderDecks();
+  persistState();
 }
 
 function deleteCard(cardId) {
@@ -399,6 +443,19 @@ function deleteCard(cardId) {
   }
   isCardFlipped = false;
   renderDecks();
+  persistState();
+}
+
+function applySearch(term) {
+  searchTerm = term;
+  renderCards();
+}
+
+function debouncedSearch(event) {
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = window.setTimeout(() => {
+    applySearch(event.target.value);
+  }, 300);
 }
 
 function trapFocus(event) {
@@ -524,6 +581,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 document.addEventListener('keydown', trapFocus);
+searchInput.addEventListener('input', debouncedSearch);
 
 renderDecks();
 enterStudyMode(activeDeckId);
+persistState();
