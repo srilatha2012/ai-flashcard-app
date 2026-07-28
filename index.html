@@ -9,31 +9,51 @@
   <body>
     <header class="app-header">
       <h1>Flashcards Study App</h1>
-      <button type="button">Add Card</button>
+      <button type="button" class="primary-btn">New Deck</button>
     </header>
 
     <div class="layout">
-      <nav class="deck-sidebar" aria-label="Flashcard decks">
+      <aside class="deck-sidebar" aria-label="Flashcard decks">
         <h2>Decks</h2>
-        <ul>
-          <li><a href="#">General Knowledge</a></li>
-          <li><a href="#">Science</a></li>
-          <li><a href="#">History</a></li>
+        <ul class="deck-list">
+          <li><a href="#" class="deck-link active">General Knowledge</a></li>
+          <li><a href="#" class="deck-link">Science</a></li>
+          <li><a href="#" class="deck-link">History</a></li>
         </ul>
-      </nav>
+      </aside>
 
-      <main>
-        <section aria-labelledby="study-heading">
-          <h2 id="study-heading">Current Deck</h2>
+      <main class="study-panel">
+        <section class="deck-view" aria-labelledby="deck-title">
+          <div class="deck-meta">
+            <div>
+              <p class="deck-label">Current deck</p>
+              <h2 id="deck-title">General Knowledge</h2>
+            </div>
+            <button type="button" class="secondary-btn">New Card</button>
+          </div>
 
-          <article class="card" aria-label="Flashcard">
-            <h3>Question</h3>
-            <p>What is the capital of France?</p>
+          <div class="toolbar" role="toolbar" aria-label="Deck tools">
+            <label class="search-field">
+              <span class="sr-only">Search cards</span>
+              <input type="search" placeholder="Search cards" />
+            </label>
+            <button type="button">Shuffle</button>
+          </div>
+
+          <article class="flashcard" aria-label="Flashcard">
+            <div class="flashcard-face">
+              <h3>Front</h3>
+              <p>What is the capital of France?</p>
+            </div>
+            <div class="flashcard-face back">
+              <h3>Back</h3>
+              <p>Paris</p>
+            </div>
           </article>
 
           <div class="card-controls" role="group" aria-label="Flashcard controls">
             <button type="button">Previous</button>
-            <button type="button">Flip Card</button>
+            <button type="button">Flip</button>
             <button type="button">Next</button>
           </div>
         </section>
@@ -41,7 +61,7 @@
     </div>
 
     <footer>
-      <p>Study smarter, one card at a time.</p>
+      <p>Tip: Flip the card to reveal the answer, then move to the next one.</p>
     </footer>
 
     <script src="app.js"></script>
